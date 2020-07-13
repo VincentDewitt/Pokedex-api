@@ -1,11 +1,14 @@
 require('dotenv').config("./env")
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const POKEDEX = require('./pokedex.json')
 
 const app = express()
+const validTypes = [`Bug`, `Dark`, `Dragon`, `Electric`, `Fairy`, `Fighting`, `Fire`, `Flying`, `Ghost`, `Grass`, `Ground`, `Ice`, `Normal`, `Poison`, `Psychic`, `Rock`, `Steel`, `Water`]
 
 app.use(morgan('dev'))
+app.use(cors())
 
 app.use(function validateBearerToken(req,res,next){
     const authToken = req.get('Authorization')
@@ -14,11 +17,9 @@ app.use(function validateBearerToken(req,res,next){
    if (!authToken || authToken.split(' ')[1] !== apiToken) {
        return res.status(401).json({ error: 'Unauthorized request' })
    }
-    
     next()
 })
 
-const validTypes = [`Bug`, `Dark`, `Dragon`, `Electric`, `Fairy`, `Fighting`, `Fire`, `Flying`, `Ghost`, `Grass`, `Ground`, `Ice`, `Normal`, `Poison`, `Psychic`, `Rock`, `Steel`, `Water`]
 app.get('/types', function handleGetTypes (req,res){
     res.json(validTypes)
 })
@@ -35,6 +36,7 @@ app.get('/pokemon', function handleGetPokemon (req,res){
             pokemon.type.includes(req.query.type)
         )
     }
+    res.json(response)
     })
 const PORT = 8000
 
